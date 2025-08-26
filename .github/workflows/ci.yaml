@@ -1,27 +1,32 @@
-name: 👷️ Publish docker template
-inputs:
-  SUFFIX:
-    description: adds a suffix to image
-    default: ""
-outputs:
-  metadata:
-    description: "docker metadata"
-    value: ${{ steps.push.outputs.metadata}}
-description: builds a Hub node project
-runs:
-  using: 'composite'
-  steps:
-    - name: compute regular docker metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: |
-          ${{ !startsWith(github.ref, 'refs/tags/') && 'docker.io/youkoulayley'}}/traefik-hub
-        tags: |
-          type=raw,value=latest-v3${{ inputs.SUFFIX }},enable=${{ github.event_name != 'pull_request' }}
-          # Only update 'latest' tag for stable releases, not pre-releases (tags containing '-')
-          type=raw,value=latest${{ inputs.SUFFIX }},enable=${{ startsWith(github.ref, 'refs/tags/') && !contains(github.ref_name, '-') }}
-          type=raw,pattern={{raw}}${{ inputs.SUFFIX }}
-          type=semver,pattern=v{{major}}${{ inputs.SUFFIX }},enable=${{ !contains(github.ref_name, '-') }}
-          type=raw,value=pr-${{ github.event.number }}${{ inputs.SUFFIX }},enable=${{ github.event_name == 'pull_request' }}
-          type=raw,value={{branch}}-{{sha}}-{{date 'X'}}${{ inputs.SUFFIX }},enable={{is_default_branch}}
+name: 📦️ test ci
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+env:
+  GIT_SHA: ${{ github.sha }}
+  GIT_TAG: ${{ github.ref_name }}
+
+jobs:
+  test:
+    runs-on: 'buildjet-4vcpu-ubuntu-2204'
+    steps:
+      - name: compute regular docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ !startsWith(github.ref, 'refs/tags/') && 'docker.io/youkoulayley'}}/traefik-hub
+          tags: |
+            type=raw,value=latest-v3${{ inputs.SUFFIX }},enable=${{ github.event_name != 'pull_request' }}
+            # Only update 'latest' tag for stable releases, not pre-releases (tags containing '-')
+            type=raw,value=latest${{ inputs.SUFFIX }},enable=${{ startsWith(github.ref, 'refs/tags/') && !contains(github.ref_name, '-') }}
+            type=raw,pattern={{raw}}${{ inputs.SUFFIX }}
+            type=semver,pattern=v{{major}}${{ inputs.SUFFIX }},enable=${{ !contains(github.ref_name, '-') }}
+            type=raw,value=pr-${{ github.event.number }}${{ inputs.SUFFIX }},enable=${{ github.event_name == 'pull_request' }}
+            type=raw,value={{branch}}-{{sha}}-{{date 'X'}}${{ inputs.SUFFIX }},enable={{is_default_branch}}

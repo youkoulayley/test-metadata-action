@@ -14,7 +14,7 @@ env:
 
 jobs:
   test:
-    runs-on: 'buildjet-4vcpu-ubuntu-2204'
+    runs-on: 'linux'
     steps:
       - name: compute regular docker metadata
         id: meta
@@ -30,3 +30,7 @@ jobs:
             type=semver,pattern=v{{major}}${{ inputs.SUFFIX }},enable=${{ !contains(github.ref_name, '-') }}
             type=raw,value=pr-${{ github.event.number }}${{ inputs.SUFFIX }},enable=${{ github.event_name == 'pull_request' }}
             type=raw,value={{branch}}-{{sha}}-{{date 'X'}}${{ inputs.SUFFIX }},enable={{is_default_branch}}
+    outputs:
+      metadata:
+        description: "docker metadata"
+        value: ${{ steps.meta.outputs}}

@@ -31,6 +31,4 @@ jobs:
             type=raw,value=pr-${{ github.event.number }}${{ inputs.SUFFIX }},enable=${{ github.event_name == 'pull_request' }}
             type=raw,value={{branch}}-{{sha}}-{{date 'X'}}${{ inputs.SUFFIX }},enable={{is_default_branch}}
     outputs:
-      metadata:
-        description: "docker metadata"
-        value: ${{ steps.meta.outputs}}
+      value: ${{ steps.meta.outputs}}

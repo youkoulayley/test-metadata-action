@@ -33,8 +33,7 @@ jobs:
           images: |
             ghcr.io/youkoulayley/test-metadata-docker
           tags: |
-             type=semver,pattern={{version}}
-             type=semver,pattern={{major}}.{{minor}}
+             type=raw,value=v{{version}}
 
       - name: Build and push Docker image
         id: push

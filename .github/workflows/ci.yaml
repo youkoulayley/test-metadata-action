@@ -23,6 +23,6 @@ jobs:
           images: |
             docker.io/youkoulayley/traefik-hub
           tags: |
-            type=raw,pattern={{raw}}${{ inputs.SUFFIX }}
+            type=raw,value={{raw}}
     outputs:
       value: ${{ steps.meta.outputs}}

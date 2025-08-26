@@ -33,8 +33,13 @@ jobs:
           images: |
             ghcr.io/youkoulayley/test-metadata-docker
           tags: |
-            type=semver,pattern=v{{version}},enable=${{ !contains(github.ref_name, '-') }}
-            type=raw,value=${{ env.GIT_TAG }},enable=${{ contains(github.ref_name, '-') }}
+            type=raw,value=latest-v3${{ inputs.SUFFIX }},enable=${{ github.event_name != 'pull_request' }}
+            # Only update 'latest' tag for stable releases, not pre-releases (tags containing '-')
+            type=raw,value=latest${{ inputs.SUFFIX }},enable=${{ startsWith(github.ref, 'refs/tags/') && !contains(github.ref_name, '-') }}
+            type=raw,pattern=v{{version}}${{ inputs.SUFFIX }}
+            type=semver,pattern=v{{major}}${{ inputs.SUFFIX }}
+            type=raw,value=pr-${{ github.event.number }}${{ inputs.SUFFIX }},enable=${{ github.event_name == 'pull_request' }}
+            type=raw,value={{branch}}-{{sha}}-{{date 'X'}}${{ inputs.SUFFIX }},enable={{is_default_branch}}
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4

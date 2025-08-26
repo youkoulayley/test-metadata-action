@@ -14,7 +14,7 @@ env:
 
 jobs:
   test:
-    runs-on: 'linux'
+    runs-on: ubuntu-latest
     steps:
       - name: compute regular docker metadata
         id: meta

@@ -33,8 +33,8 @@ jobs:
           images: |
             ghcr.io/youkoulayley/test-metadata-docker
           tags: |
-             type=raw,value=${{ env.GIT_TAG }}
-
+            type=semver,pattern=v{{version}},enable=${{ !contains(github.ref_name, '-') }}
+            type=raw,value=${{ env.GIT_TAG }},enable=${{ contains(github.ref_name, '-') }}
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
